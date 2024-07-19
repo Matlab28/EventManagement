@@ -3,14 +3,12 @@ package com.example.simpleeventmanager.controller;
 import com.example.simpleeventmanager.dto.request.UserRequestDto;
 import com.example.simpleeventmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/event")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "https://matlab28.github.io")
 public class UserController {
     private final UserService service;
 
