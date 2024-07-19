@@ -99,9 +99,23 @@
             margin: 0;
             font-size: 24px;
             color: #ffffff;
-            background: linear-gradient(45deg, #ff4081, #007bff);
-            padding: 10px 20px;
-            border-radius: 50px; /* Circular background */
+        }
+
+        .logo h1 .ltc {
+            background: none; /* No background for LTC */
+            font-size: 28px; /* Font size for LTC */
+            font-weight: bold; /* Make LTC bolder */
+            color: #ffffff; /* Text color */
+        }
+
+        .logo h1 .lab {
+            display: inline-block; /* Make the background fit the text closely */
+            background: linear-gradient(45deg, #007bff, #ff4081); /* Background color */
+            padding: 2px 8px; /* Smaller padding to fit text closely */
+            border-radius: 10px; /* Rounded corners */
+            font-size: 24px; /* Font size for Lab */
+            font-weight: normal; /* Make Lab thinner */
+            color: #ffffff; /* Text color */
         }
 
         h1.email-sender-header {
@@ -187,7 +201,7 @@
 </head>
 <body>
 <div class="logo">
-    <h1>LTC Lab</h1>
+    <h1><span class="ltc">LTC</span> <span class="lab">lab</span></h1>
 </div>
 
 <hr class="separator">
@@ -298,7 +312,6 @@
 </script>
 </body>
 </html>
-
 
 
 
