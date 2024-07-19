@@ -99,6 +99,7 @@
             margin: 0;
             font-size: 24px;
             color: #ffffff;
+            position: relative; /* Allows for absolute positioning within h1 */
         }
 
         .logo h1 .ltc {
@@ -106,16 +107,21 @@
             font-size: 28px; /* Font size for LTC */
             font-weight: bold; /* Make LTC bolder */
             color: #ffffff; /* Text color */
+            display: inline-block; /* Allow for positioning */
         }
 
         .logo h1 .lab {
-            display: inline-block; /* Make the background fit the text closely */
+            display: inline-block; /* Keep Lab inline */
             background: linear-gradient(45deg, #007bff, #ff4081); /* Background color */
             padding: 2px 8px; /* Smaller padding to fit text closely */
             border-radius: 10px; /* Rounded corners */
             font-size: 24px; /* Font size for Lab */
             font-weight: normal; /* Make Lab thinner */
             color: #ffffff; /* Text color */
+            position: absolute; /* Position Lab relative to the h1 */
+            top: 50%; /* Center Lab vertically */
+            left: calc(100% + 10px); /* Position Lab right of LTC with space */
+            transform: translateY(-50%); /* Adjust vertical alignment */
         }
 
         h1.email-sender-header {

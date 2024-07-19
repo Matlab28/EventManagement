@@ -99,6 +99,7 @@
             margin: 0;
             font-size: 24px;
             color: #ffffff;
+            position: relative; /* Allows for absolute positioning within h1 */
         }
 
         .logo h1 .ltc {
@@ -106,16 +107,21 @@
             font-size: 28px; /* Font size for LTC */
             font-weight: bold; /* Make LTC bolder */
             color: #ffffff; /* Text color */
+            display: inline-block; /* Allow for positioning */
         }
 
         .logo h1 .lab {
-            display: inline-block; /* Make the background fit the text closely */
-            background: linear-gradient(45deg, #ff4081, #007bff); /* Background color */
+            display: inline-block; /* Keep Lab inline */
+            background: linear-gradient(45deg, #007bff, #ff4081); /* Background color */
             padding: 2px 8px; /* Smaller padding to fit text closely */
             border-radius: 10px; /* Rounded corners */
             font-size: 24px; /* Font size for Lab */
             font-weight: normal; /* Make Lab thinner */
             color: #ffffff; /* Text color */
+            position: absolute; /* Position Lab relative to the h1 */
+            top: 50%; /* Center Lab vertically */
+            left: calc(100% + 10px); /* Position Lab right of LTC with space */
+            transform: translateY(-50%); /* Adjust vertical alignment */
         }
 
         h1.email-sender-header {
@@ -249,44 +255,31 @@
     <p>Email sent successfully!</p>
     <button onclick="closePopup()">Done</button>
 </div>
-
 <script>
     function addEmailField() {
         const emailToGroup = document.getElementById('emailToGroup');
         const newEmailGroup = document.createElement('div');
         newEmailGroup.className = 'email-group';
-        newEmailGroup.innerHTML = `
-                <input type="text" class="email-input" name="emailTo">
-                <button type="button" onclick="removeEmailField(this)">Remove</button>
-            `;
+        newEmailGroup.innerHTML = `<input type="text" class="email-input" name="emailTo" required>`;
         emailToGroup.appendChild(newEmailGroup);
-    }
-
-    function removeEmailField(button) {
-        button.parentElement.remove();
     }
 
     function updateFileInfo() {
         const fileInput = document.getElementById('attachment');
+        const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         if (fileInput.files.length > 0) {
             fileName.textContent = fileInput.files[0].name;
-            document.getElementById('fileInfo').style.display = 'flex';
+            fileInfo.style.display = 'flex';
         } else {
-            fileName.textContent = 'No file chosen';
-            document.getElementById('fileInfo').style.display = 'none';
+            fileInfo.style.display = 'none';
         }
     }
 
     function removeFile() {
         const fileInput = document.getElementById('attachment');
-        fileInput.value = ''; // Clear the file input
-        updateFileInfo(); // Update the file info display
-    }
-
-    function showPopup() {
-        document.querySelector('.popup').style.display = 'block';
-        document.querySelector('.popup-overlay').style.display = 'block';
+        fileInput.value = '';
+        updateFileInfo();
     }
 
     function closePopup() {
@@ -294,24 +287,15 @@
         document.querySelector('.popup-overlay').style.display = 'none';
     }
 
-    document.getElementById('emailForm').addEventListener('submit', function (event) {
+    document.getElementById('emailForm').addEventListener('submit', function(event) {
         event.preventDefault();
-
-        const formData = new FormData(this);
-
-        fetch('http://localhost:8080/event/send-email', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.text())
-            .then(result => {
-                showPopup();
-            })
-            .catch(error => alert('Error sending email: ' + error));
+        document.querySelector('.popup').style.display = 'block';
+        document.querySelector('.popup-overlay').style.display = 'block';
     });
 </script>
 </body>
 </html>
+
 
 
 <!--<!DOCTYPE html>-->
