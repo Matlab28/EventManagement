@@ -4,11 +4,14 @@ import com.example.simpleeventmanager.dto.request.UserRequestDto;
 import com.example.simpleeventmanager.dto.response.UserResponseDto;
 import com.example.simpleeventmanager.entity.UserEntity;
 import com.example.simpleeventmanager.repository.UserRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -59,26 +62,61 @@ public class UserService {
 
     public void sendEmail(UserRequestDto dto) {
         UserEntity entity = modelMapper.map(dto, UserEntity.class);
-        SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom(dto.getEmailFrom().toLowerCase());
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
+            helper.setFrom(dto.getEmailFrom().toLowerCase());
 
-        String[] emailToArray = dto.getEmailTo().toArray(new String[0]);
+            String[] emailToArray = dto.getEmailTo().toArray(new String[0]);
+            emailToArray = Arrays.stream(emailToArray)
+                    .map(String::toLowerCase)
+                    .toArray(String[]::new);
 
-        emailToArray = Arrays.stream(emailToArray)
-                .map(String::toLowerCase)
-                .toArray(String[]::new);
+            helper.setTo(emailToArray);
+            helper.setSubject(dto.getSubject());
+            helper.setText(dto.getMessage());
 
-        message.setTo(emailToArray);
+            // Attach file if present
+            if (dto.getAttachment() != null && !dto.getAttachment().isEmpty()) {
+                helper.addAttachment(dto.getAttachment().getOriginalFilename(), dto.getAttachment());
+            }
 
-        message.setText(dto.getMessage());
-        message.setSubject(dto.getSubject());
-        javaMailSender.send(message);
+            javaMailSender.send(message);
+            log.info("Message sent from - " + dto.getEmailFrom().toLowerCase() + ", to - "
+                    + String.join(", ", dto.getEmailTo()).toLowerCase());
+        } catch (MessagingException e) {
+            log.error("Error sending email: " + e.getMessage(), e);
+        }
 
-        log.info("Message sent from - " + dto.getEmailFrom().toLowerCase() + ", to - " + String.join(", ", dto.getEmailTo()).toLowerCase());
         repository.save(entity);
     }
+
+
+//    public void sendEmail(UserRequestDto dto) {
+//        UserEntity entity = modelMapper.map(dto, UserEntity.class);
+//        SimpleMailMessage message = new SimpleMailMessage();
+//
+//        message.setFrom(dto.getEmailFrom().toLowerCase());
+//
+//
+//        String[] emailToArray = dto.getEmailTo().toArray(new String[0]);
+//
+//        emailToArray = Arrays.stream(emailToArray)
+//                .map(String::toLowerCase)
+//                .toArray(String[]::new);
+//
+//        message.setTo(emailToArray);
+//
+//        message.setText(dto.getMessage());
+//        message.setSubject(dto.getSubject());
+//        javaMailSender.send(message);
+//
+//        log.info("Message sent from - " + dto.getEmailFrom().toLowerCase() + ", to - "
+//                + String.join(", ", dto.getEmailTo()).toLowerCase());
+//        repository.save(entity);
+//    }
 
     public List<UserResponseDto> readAll() {
         log.info("All user info responded");

@@ -2,6 +2,7 @@ package com.example.simpleeventmanager.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,4 +14,5 @@ public class UserResponseDto {
     private List<String> emailTo;
     private String subject;
     private String message;
+    private MultipartFile attachment;
 }

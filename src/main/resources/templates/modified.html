@@ -37,6 +37,26 @@
             border-radius: 15px; /* Circular corners */
         }
 
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff4081, #007bff);
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 15px; /* Circular corners */
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .custom-file-upload:hover {
+            background: linear-gradient(45deg, #ff79b0, #0056b3);
+        }
+
         button {
             padding: 10px 20px;
             background: linear-gradient(45deg, #ff4081, #007bff);
@@ -101,6 +121,29 @@
             margin: 20px 0; /* Space around the separator */
         }
 
+        .file-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        #fileName {
+            margin-right: 10px;
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #ff4081, #007bff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px; /* Circular corners */
+            padding: 5px 10px;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(45deg, #ff79b0, #0056b3);
+        }
+
         /* Popup styles */
         .popup {
             display: none;
@@ -151,19 +194,19 @@
 
 <div class="container">
     <h1 class="email-sender-header">Email Sender</h1>
-    <form id="emailForm">
+    <form id="emailForm" enctype="multipart/form-data">
         <div class="input-group">
-            <label for="emailFrom">From Email:</label>
+            <label for="emailFrom">Email From:</label>
             <input type="text" id="emailFrom" name="emailFrom" required>
         </div>
         <div id="emailToContainer" class="input-group">
-            <label>Send to Email:</label>
+            <label>Email Send to:</label>
             <div id="emailToGroup">
                 <div class="email-group">
                     <input type="text" class="email-input" name="emailTo" required>
                 </div>
             </div>
-            <button type="button" onclick="addEmailField()">Send to Another Email</button>
+            <button type="button" onclick="addEmailField()">Send Another Email</button>
         </div>
         <div class="input-group">
             <label for="subject">Subject:</label>
@@ -172,6 +215,16 @@
         <div class="input-group">
             <label for="message">Message:</label>
             <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <div class="input-group">
+            <label for="attachment" class="custom-file-upload">
+                Choose File
+            </label>
+            <input type="file" id="attachment" name="attachment" onchange="updateFileInfo()">
+            <div id="fileInfo" class="file-info" style="display: none;">
+                <span id="fileName">No file chosen</span>
+                <button type="button" id="deleteBtn" class="delete-btn" onclick="removeFile()">Remove</button>
+            </div>
         </div>
         <button type="submit">Send</button>
     </form>
@@ -199,6 +252,24 @@
         button.parentElement.remove();
     }
 
+    function updateFileInfo() {
+        const fileInput = document.getElementById('attachment');
+        const fileName = document.getElementById('fileName');
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            document.getElementById('fileInfo').style.display = 'flex';
+        } else {
+            fileName.textContent = 'No file chosen';
+            document.getElementById('fileInfo').style.display = 'none';
+        }
+    }
+
+    function removeFile() {
+        const fileInput = document.getElementById('attachment');
+        fileInput.value = ''; // Clear the file input
+        updateFileInfo(); // Update the file info display
+    }
+
     function showPopup() {
         document.querySelector('.popup').style.display = 'block';
         document.querySelector('.popup-overlay').style.display = 'block';
@@ -213,27 +284,323 @@
         event.preventDefault();
 
         const formData = new FormData(this);
-        const data = {
-            emailFrom: formData.get('emailFrom'),
-            emailTo: formData.getAll('emailTo'),
-            subject: formData.get('subject'),
-            message: formData.get('message')
-        };
 
         fetch('http://localhost:8080/event/send-email', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: formData
         })
             .then(response => response.text())
-            .then(result => showPopup())
+            .then(result => {
+                showPopup();
+            })
             .catch(error => alert('Error sending email: ' + error));
     });
 </script>
 </body>
 </html>
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Email Sender</title>-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            padding: 20px;-->
+<!--            background-color: #121212;-->
+<!--            color: #ffffff;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            max-width: 600px;-->
+<!--            margin: 0 auto;-->
+<!--        }-->
+
+<!--        .input-group {-->
+<!--            margin-bottom: 15px;-->
+<!--        }-->
+
+<!--        label {-->
+<!--            display: block;-->
+<!--            margin-bottom: 5px;-->
+<!--        }-->
+
+<!--        input[type="text"], textarea {-->
+<!--            width: 100%;-->
+<!--            padding: 8px;-->
+<!--            box-sizing: border-box;-->
+<!--            background-color: #1e1e1e;-->
+<!--            border: 1px solid #333;-->
+<!--            color: #ffffff;-->
+<!--            border-radius: 15px; /* Circular corners */-->
+<!--        }-->
+
+
+<!--        input[type="file"]::before {-->
+<!--            content: 'Choose File';-->
+<!--            display: inline-block;-->
+<!--            background: linear-gradient(45deg, #ff4081, #007bff);-->
+<!--            color: #ffffff;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 15px; /* Circular corners */-->
+<!--            text-align: center;-->
+<!--            width: 100%;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        button {-->
+<!--            padding: 10px 20px;-->
+<!--            background: linear-gradient(45deg, #ff4081, #007bff);-->
+<!--            color: #fff;-->
+<!--            border: none;-->
+<!--            cursor: pointer;-->
+<!--            border-radius: 15px; /* Circular corners */-->
+<!--        }-->
+
+<!--        button:hover {-->
+<!--            background: linear-gradient(45deg, #ff79b0, #0056b3);-->
+<!--        }-->
+
+<!--        .email-group {-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        .email-group .email-input {-->
+<!--            display: inline-block;-->
+<!--            width: calc(100% - 120px);-->
+<!--        }-->
+
+<!--        .email-group button {-->
+<!--            width: 100px;-->
+<!--        }-->
+
+<!--        .logo {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .logo img {-->
+<!--            width: 50px;-->
+<!--            height: 50px;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+
+<!--        .logo h1 {-->
+<!--            margin: 0;-->
+<!--            font-size: 24px;-->
+<!--            color: #ffffff;-->
+<!--            background: linear-gradient(45deg, #ff4081, #007bff);-->
+<!--            padding: 10px 20px;-->
+<!--            border-radius: 50px; /* Circular background */-->
+<!--        }-->
+
+<!--        h1.email-sender-header {-->
+<!--            font-family: 'Lobster', cursive;-->
+<!--            font-size: 36px;-->
+<!--            background: linear-gradient(45deg, #ffa726, #007bff);-->
+<!--            -webkit-background-clip: text;-->
+<!--            -webkit-text-fill-color: transparent;-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        hr.separator {-->
+<!--            border: 0;-->
+<!--            height: 1px;-->
+<!--            background: #ffffff;-->
+<!--            margin: 20px 0; /* Space around the separator */-->
+<!--        }-->
+
+<!--        .file-info {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            margin-top: 10px;-->
+<!--        }-->
+
+<!--        #fileName {-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+
+<!--        .delete-btn {-->
+<!--            background: linear-gradient(45deg, #ff4081, #007bff);-->
+<!--            color: #fff;-->
+<!--            border: none;-->
+<!--            cursor: pointer;-->
+<!--            border-radius: 15px; /* Circular corners */-->
+<!--            padding: 5px 10px;-->
+<!--        }-->
+
+<!--        .delete-btn:hover {-->
+<!--            background: linear-gradient(45deg, #ff79b0, #0056b3);-->
+<!--        }-->
+
+<!--        /* Popup styles */-->
+<!--        .popup {-->
+<!--            display: none;-->
+<!--            position: fixed;-->
+<!--            top: 50%;-->
+<!--            left: 50%;-->
+<!--            transform: translate(-50%, -50%);-->
+<!--            background-color: #333;-->
+<!--            color: #fff;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 10px;-->
+<!--            z-index: 1001;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .popup button {-->
+<!--            margin-top: 10px;-->
+<!--            background: linear-gradient(45deg, #ff4081, #007bff);-->
+<!--            border: none;-->
+<!--            padding: 10px 20px;-->
+<!--            color: #fff;-->
+<!--            cursor: pointer;-->
+<!--            border-radius: 15px; /* Circular corners */-->
+<!--        }-->
+
+<!--        .popup button:hover {-->
+<!--            background: linear-gradient(45deg, #ff79b0, #0056b3);-->
+<!--        }-->
+
+<!--        .popup-overlay {-->
+<!--            display: none;-->
+<!--            position: fixed;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--            background-color: rgba(0, 0, 0, 0.7);-->
+<!--            z-index: 1000;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="logo">-->
+<!--    <h1>LTC Lab</h1>-->
+<!--</div>-->
+
+<!--<hr class="separator">-->
+
+<!--<div class="container">-->
+<!--    <h1 class="email-sender-header">Email Sender</h1>-->
+<!--    <form id="emailForm" enctype="multipart/form-data">-->
+<!--        <div class="input-group">-->
+<!--            <label for="emailFrom">Email From:</label>-->
+<!--            <input type="text" id="emailFrom" name="emailFrom" required>-->
+<!--        </div>-->
+<!--        <div id="emailToContainer" class="input-group">-->
+<!--            <label>Email Send to:</label>-->
+<!--            <div id="emailToGroup">-->
+<!--                <div class="email-group">-->
+<!--                    <input type="text" class="email-input" name="emailTo" required>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <button type="button" onclick="addEmailField()">Send Another Email</button>-->
+<!--        </div>-->
+<!--        <div class="input-group">-->
+<!--            <label for="subject">Subject:</label>-->
+<!--            <input type="text" id="subject" name="subject" required>-->
+<!--        </div>-->
+<!--        <div class="input-group">-->
+<!--            <label for="message">Message:</label>-->
+<!--            <textarea id="message" name="message" rows="5" required></textarea>-->
+<!--        </div>-->
+<!--        <div class="input-group">-->
+<!--            <label for="attachment">Attach File:</label>-->
+<!--            <input type="file" id="attachment" name="attachment" onchange="updateFileInfo()">-->
+<!--            <div id="fileInfo" class="file-info" style="display: none;">-->
+<!--                <span id="fileName">No file chosen</span>-->
+<!--                <button type="button" id="deleteBtn" class="delete-btn" onclick="removeFile()">Remove</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <button type="submit">Send</button>-->
+<!--    </form>-->
+<!--</div>-->
+
+<!--<div class="popup-overlay" onclick="closePopup()"></div>-->
+<!--<div class="popup">-->
+<!--    <p>Email sent successfully!</p>-->
+<!--    <button onclick="closePopup()">Done</button>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    function addEmailField() {-->
+<!--        const emailToGroup = document.getElementById('emailToGroup');-->
+<!--        const newEmailGroup = document.createElement('div');-->
+<!--        newEmailGroup.className = 'email-group';-->
+<!--        newEmailGroup.innerHTML = `-->
+<!--                <input type="text" class="email-input" name="emailTo">-->
+<!--                <button type="button" onclick="removeEmailField(this)">Remove</button>-->
+<!--            `;-->
+<!--        emailToGroup.appendChild(newEmailGroup);-->
+<!--    }-->
+
+<!--    function removeEmailField(button) {-->
+<!--        button.parentElement.remove();-->
+<!--    }-->
+
+<!--    function updateFileInfo() {-->
+<!--        const fileInput = document.getElementById('attachment');-->
+<!--        const fileName = document.getElementById('fileName');-->
+<!--        if (fileInput.files.length > 0) {-->
+<!--            fileName.textContent = fileInput.files[0].name;-->
+<!--            document.getElementById('fileInfo').style.display = 'flex';-->
+<!--        } else {-->
+<!--            fileName.textContent = 'No file chosen';-->
+<!--            document.getElementById('fileInfo').style.display = 'none';-->
+<!--        }-->
+<!--    }-->
+
+<!--    function removeFile() {-->
+<!--        const fileInput = document.getElementById('attachment');-->
+<!--        fileInput.value = ''; // Clear the file input-->
+<!--        updateFileInfo(); // Update the file info display-->
+<!--    }-->
+
+<!--    function showPopup() {-->
+<!--        document.querySelector('.popup').style.display = 'block';-->
+<!--        document.querySelector('.popup-overlay').style.display = 'block';-->
+<!--    }-->
+
+<!--    function closePopup() {-->
+<!--        document.querySelector('.popup').style.display = 'none';-->
+<!--        document.querySelector('.popup-overlay').style.display = 'none';-->
+<!--    }-->
+
+<!--    document.getElementById('emailForm').addEventListener('submit', function (event) {-->
+<!--        event.preventDefault();-->
+
+<!--        const formData = new FormData(this);-->
+
+<!--        fetch('http://localhost:8080/event/send-email', {-->
+<!--            method: 'POST',-->
+<!--            body: formData // Directly send FormData including the file-->
+<!--        })-->
+<!--            .then(response => response.text())-->
+<!--            .then(result => showPopup())-->
+<!--            .catch(error => alert('Error sending email: ' + error));-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -306,7 +673,7 @@
 <!--        .logo {-->
 <!--            display: flex;-->
 <!--            align-items: center;-->
-<!--            margin-bottom: 40px; /* Increased space */-->
+<!--            margin-bottom: 20px;-->
 <!--        }-->
 
 <!--        .logo img {-->
@@ -331,7 +698,14 @@
 <!--            -webkit-background-clip: text;-->
 <!--            -webkit-text-fill-color: transparent;-->
 <!--            text-align: center;-->
-<!--            margin-bottom: 20px; /* Increased space */-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        hr.separator {-->
+<!--            border: 0;-->
+<!--            height: 1px;-->
+<!--            background: #ffffff;-->
+<!--            margin: 20px 0; /* Space around the separator */-->
 <!--        }-->
 
 <!--        /* Popup styles */-->
@@ -379,6 +753,9 @@
 <!--<div class="logo">-->
 <!--    <h1>LTC Lab</h1>-->
 <!--</div>-->
+
+<!--<hr class="separator">-->
+
 <!--<div class="container">-->
 <!--    <h1 class="email-sender-header">Email Sender</h1>-->
 <!--    <form id="emailForm">-->
