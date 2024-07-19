@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,16 +61,22 @@ public class UserService {
         UserEntity entity = modelMapper.map(dto, UserEntity.class);
         SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom(dto.getEmailFrom());
+        message.setFrom(dto.getEmailFrom().toLowerCase());
+
 
         String[] emailToArray = dto.getEmailTo().toArray(new String[0]);
+
+        emailToArray = Arrays.stream(emailToArray)
+                .map(String::toLowerCase)
+                .toArray(String[]::new);
+
         message.setTo(emailToArray);
 
         message.setText(dto.getMessage());
         message.setSubject(dto.getSubject());
         javaMailSender.send(message);
 
-        log.info("Message sent from - " + dto.getEmailFrom() + ", to - " + String.join(", ", dto.getEmailTo()));
+        log.info("Message sent from - " + dto.getEmailFrom().toLowerCase() + ", to - " + String.join(", ", dto.getEmailTo()).toLowerCase());
         repository.save(entity);
     }
 
@@ -82,4 +89,3 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 }
-//matlab.abbaszada@gmail.com
